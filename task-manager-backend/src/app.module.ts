@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import configuration from './config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { TasksModule } from './tasks/tasks.module';
@@ -7,15 +9,16 @@ import { Task } from './tasks/task.entity';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      load: [configuration],
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres', // Replace with your PostgreSQL username
-      password: 'your_password', // Replace with your PostgreSQL password
-      database: 'task_manager',
+      url: process.env.DATABASE_URL,
       entities: [User, Task],
-      synchronize: true, // Auto-create tables (use migrations in production)
+      synchronize: true, // Be careful with this in production
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
     }),
     AuthModule,
     TasksModule,
