@@ -18,13 +18,16 @@ import { HealthModule } from './health/health.module';
       type: 'postgres',
       url: process.env.DATABASE_URL,
       entities: [User, Task],
-      synchronize: true, // Be careful with this in production
+      synchronize: false, // Disabled for production
       ssl: true,
       extra: {
         max: 20,
         ssl: {
           rejectUnauthorized: false,
         },
+        poolSize: 20,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 2000,
       },
     }),
     AuthModule,
