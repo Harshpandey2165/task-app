@@ -4,6 +4,15 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useRouter } from 'next/router';
 import api from '../lib/api.js';
 
+// Add token to all requests
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 export default function Tasks() {
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -14,12 +23,21 @@ export default function Tasks() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!localStorage.getItem('token')) {
+    const token = localStorage.getItem('token');
+    if (!token) {
       router.push('/');
+      return;
     }
+
+    // Verify token validity
+    api.get('/auth/profile')
+      .catch(() => {
+        localStorage.removeItem('token');
+        router.push('/');
+      });
   }, [router]);
 
-  const { data: tasks } = useQuery({
+  const { data: tasks, isLoading, error: tasksError } = useQuery({
     queryKey: ['tasks'],
     queryFn: () => api.get('/tasks').then((res) => res.data),
   });
@@ -81,33 +99,92 @@ export default function Tasks() {
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Task Manager</h1>
-          <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded">Logout</button>
+          <button 
+            onClick={handleLogout} 
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors duration-300"
+          >
+            Logout
+          </button>
         </div>
-        {error && <p className="text-red-500">{error}</p>}
-        <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow-md mb-4">
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" required className="w-full mb-2 p-2 border rounded" />
-          <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description" className="w-full mb-2 p-2 border rounded" />
-          <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full mb-2 p-2 border rounded">
-            <option>To Do</option>
-            <option>In Progress</option>
-            <option>Done</option>
-          </select>
-          <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded">{editId ? 'Update' : 'Add'}</button>
+        {(error || tasksError) && (
+          <p className="text-red-500 mb-4">{error || tasksError?.message}</p>
+        )}
+        {isLoading && (
+          <div className="text-center mb-4">
+            <p className="text-gray-600">Loading tasks...</p>
+          </div>
+        )}
+        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-lg mb-6">
+          <div className="mb-4">
+            <input 
+              value={title} 
+              onChange={(e) => setTitle(e.target.value)} 
+              placeholder="Task Title" 
+              required 
+              className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+            />
+          </div>
+          <div className="mb-4">
+            <textarea 
+              value={description} 
+              onChange={(e) => setDescription(e.target.value)} 
+              placeholder="Task Description" 
+              className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors min-h-[100px]"
+            />
+          </div>
+          <div className="mb-4">
+            <select 
+              value={status} 
+              onChange={(e) => setStatus(e.target.value)} 
+              className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white"
+            >
+              <option>To Do</option>
+              <option>In Progress</option>
+              <option>Done</option>
+            </select>
+          </div>
+          <button 
+            type="submit" 
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-semibold transition-colors duration-300"
+          >
+            {editId ? 'Update Task' : 'Add New Task'}
+          </button>
         </form>
         <DragDropContext onDragEnd={handleDragEnd}>
           {['To Do', 'In Progress', 'Done'].map((status) => (
             <Droppable key={status} droppableId={status}>
               {(provided) => (
-                <div {...provided.droppableProps} ref={provided.innerRef} className="p-4 bg-gray-200 rounded mb-4">
-                  <h2 className="text-xl mb-2">{status}</h2>
+                <div 
+                  {...provided.droppableProps} 
+                  ref={provided.innerRef} 
+                  className="p-4 bg-gray-100 rounded-lg mb-4 min-h-[200px]"
+                >
+                  <h2 className="text-xl font-semibold mb-4 text-gray-700">{status}</h2>
                   {tasks?.filter((task) => task.status === status).map((task, index) => (
                     <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
                       {(provided) => (
-                        <div {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef} className="bg-white p-2 mb-2 rounded shadow-md">
-                          <h3>{task.title}</h3>
-                          <p>{task.description}</p>
-                          <button onClick={() => handleEdit(task)} className="bg-blue-500 text-white px-2 py-1 mr-2 rounded">Edit</button>
-                          <button onClick={() => deleteTask.mutate(task.id)} className="bg-red-500 text-white px-2 py-1 rounded">Delete</button>
+                        <div 
+                          {...provided.draggableProps} 
+                          {...provided.dragHandleProps} 
+                          ref={provided.innerRef} 
+                          className="bg-white p-4 mb-3 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200"
+                        >
+                          <h3 className="font-semibold text-lg mb-2 text-gray-800">{task.title}</h3>
+                          <p className="text-gray-600 mb-4">{task.description}</p>
+                          <div className="flex space-x-2">
+                            <button 
+                              onClick={() => handleEdit(task)} 
+                              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors duration-300 flex-1"
+                            >
+                              Edit
+                            </button>
+                            <button 
+                              onClick={() => deleteTask.mutate(task.id)} 
+                              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors duration-300 flex-1"
+                            >
+                              Delete
+                            </button>
+                          </div>
                         </div>
                       )}
                     </Draggable>
