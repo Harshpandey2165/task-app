@@ -2,9 +2,11 @@
   "name": "task-manager-backend",
   "version": "1.0.0",
   "scripts": {
+    "build": "nest build",
     "start": "node dist/main",
     "start:dev": "nest start --watch",
-    "build": "nest build"
+    "start:prod": "node dist/main.js",
+    "postinstall": "npm run build"
   },
   "dependencies": {
     "@nestjs/cli": "^10.3.2",
