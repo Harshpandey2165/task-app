@@ -19,10 +19,12 @@ import { HealthModule } from './health/health.module';
       url: process.env.DATABASE_URL,
       entities: [User, Task],
       synchronize: true, // Be careful with this in production
-      ssl: process.env.NODE_ENV === 'production',
+      ssl: true,
       extra: {
         max: 20,
-        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: true } : false,
+        ssl: {
+          rejectUnauthorized: false,
+        },
       },
     }),
     AuthModule,
