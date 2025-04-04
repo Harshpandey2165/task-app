@@ -1,5 +1,6 @@
-export default (): Record<string, any> => ({
-  port: parseInt(process.env.PORT, 10) || 3000,
+export default () => ({
+  nodeEnv: process.env.NODE_ENV || 'development',
+  port: parseInt(process.env.PORT || '3000', 10),
   database: {
     url: process.env.DATABASE_URL,
   },
@@ -8,6 +9,6 @@ export default (): Record<string, any> => ({
     expiresIn: '1d',
   },
   cors: {
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'],
   },
 });
