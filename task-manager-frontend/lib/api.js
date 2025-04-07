@@ -6,6 +6,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
+    'Origin': 'https://task-manager-bay-eight.vercel.app'
   },
 });
 
