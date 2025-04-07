@@ -8,7 +8,7 @@ async function bootstrap() {
     origin: ['http://localhost:4200', 'https://task-app-tdx9.vercel.app'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Origin'],
     exposedHeaders: ['Authorization']
   });
   app.useGlobalPipes(new ValidationPipe());
