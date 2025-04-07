@@ -1,0 +1,21 @@
+{
+  "name": "task-manager-backend",
+  "type": "nodejs",
+  "region": "production",
+  "env": {
+    "NODE_ENV": "production",
+    "PORT": "51441",
+    "DATABASE_URL": "postgresql://postgres:fxcwkoGIpLvgFMLoBJIXRlfSAODgHGYa@yamabiko.proxy.rlwy.net:51441/railway"
+  },
+  "build": {
+    "cmd": "npm install",
+    "dir": "."
+  },
+  "start": "node dist/main.js",
+  "databases": [
+    {
+      "type": "postgres",
+      "name": "task-manager-db"
+    }
+  ]
+}
