@@ -12,7 +12,7 @@ async function bootstrap() {
     exposedHeaders: ['Authorization']
   });
   app.useGlobalPipes(new ValidationPipe());
-  await app.listen(3000);
-  console.log('Backend running on http://localhost:3001');
+  await app.listen(5432);
+  console.log('Backend running on http://localhost:5432');
 }
 bootstrap();
