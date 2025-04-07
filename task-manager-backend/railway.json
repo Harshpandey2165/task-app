@@ -4,8 +4,8 @@
   "region": "production",
   "env": {
     "NODE_ENV": "production",
-    "PORT": "51441",
-    "DATABASE_URL": "postgresql://postgres:fxcwkoGIpLvgFMLoBJIXRlfSAODgHGYa@yamabiko.proxy.rlwy.net:51441/railway"
+    "PORT": "3001",
+    "DATABASE_URL": "${DATABASE_URL}"
   },
   "build": {
     "cmd": "npm install",

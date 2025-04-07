@@ -1,0 +1,11 @@
+project = "task-manager"
+environment = "production"
+service = "task-manager-backend"
+
+[build]
+  cmd = "npm install"
+  dir = "."
+
+[env]
+  NODE_ENV = "production"
+  PORT = "3001"
