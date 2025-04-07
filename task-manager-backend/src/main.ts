@@ -5,11 +5,13 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: ['http://localhost:4200', 'https://task-manager-bay-eight.vercel.app'],
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    origin: ['http://localhost:4200', 'https://task-app-ten-delta.vercel.app'],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization', 'Origin'],
-    exposedHeaders: ['Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Accept'],
+    exposedHeaders: ['Authorization'],
+    preflightContinue: false,
+    maxAge: 86400,
   });
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(5432);
