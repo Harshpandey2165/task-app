@@ -16,7 +16,7 @@ export class UsersController {
     if (user) {
       throw new Error('User already exists');
     }
-    return this.authService.login(body);
+    return this.authService.register(body.username, body.password);
   }
 
   @Post('login')
@@ -25,7 +25,7 @@ export class UsersController {
     if (!user) {
       throw new Error('Invalid credentials');
     }
-    return this.authService.login(body);
+    return this.authService.login(body.username, body.password);
   }
 
   @UseGuards(AuthGuard())

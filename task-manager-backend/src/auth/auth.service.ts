@@ -18,8 +18,8 @@ export class AuthService {
     console.log('Default user created/checked');
   }
 
-  async login(user: { username: string; password: string }) {
-    const userEntity = await this.usersService.validateUser(user.username, user.password);
+  async login(username: string, password: string) {
+    const userEntity = await this.usersService.validateUser(username, password);
     if (!userEntity) {
       throw new UnauthorizedException('Invalid credentials');
     }
